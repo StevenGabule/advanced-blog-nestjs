@@ -24,7 +24,7 @@ export class UsersService {
     const user = this.usersRepository.create({name, username, password});
     try {
       await this.usersRepository.save(user);
-      const {password, ...result} = user;
+      const {password: _, ...result} = user;
       return result as User;
     } catch (error) {
       // Handle duplicate username error (PostgresSQL error code 23505 for unique violation)
@@ -36,5 +36,13 @@ export class UsersService {
         throw new InternalServerErrorException();
       }
     }
+  }
+
+  async update(id: string, updateData: Partial<User>): Promise<void> {
+    await this.usersRepository.update(id, updateData);
+  }
+
+  async findOneByVerificationToken(verificationToken: string) : Promise<User | null> {
+    return this.usersRepository.findOne({where: {verificationToken}, relations: ['refreshTokens']});
   }
 }

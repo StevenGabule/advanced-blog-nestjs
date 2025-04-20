@@ -9,6 +9,8 @@ import {User} from './users/user.entity';
 import {ProfileController} from './profile/profile.controller';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {APP_FILTER} from "@nestjs/core";
+import {RefreshToken} from "./auth/refresh-token.entity";
+import {MailModule} from "./mail/mail.module";
 
 @Module({
   imports: [
@@ -26,11 +28,12 @@ import {APP_FILTER} from "@nestjs/core";
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [User],
+        entities: [User, RefreshToken],
         synchronize: configService.get<boolean>('TYPEORM_SYNCHRONIZE', configService.get<string>('NODE_ENV') !== 'production'),
       }),
     }),
     AuthModule,
+    MailModule
   ],
   controllers: [AppController, PostController, ProfileController],
   providers: [

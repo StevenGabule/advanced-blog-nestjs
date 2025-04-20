@@ -1,5 +1,6 @@
-import {BeforeInsert, Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import {RefreshToken} from "../auth/refresh-token.entity";
 
 @Entity('users')
 export class User {
@@ -9,11 +10,23 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column({unique: true})
   username: string;
 
   @Column()
   password: string;
+
+  @Column({default: false})
+  isVerified: boolean;
+
+  @Column({type: 'varchar', nullable: true})
+  verificationToken: string | null;
+
+  @Column({nullable: true, type: 'timestamp'})
+  verificationTokenExpiresAt: Date | null;
+
+  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
+  refreshTokens: RefreshToken
 
   @BeforeInsert()
   async hashPassword() {
